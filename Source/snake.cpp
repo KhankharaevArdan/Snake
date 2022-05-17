@@ -10,7 +10,8 @@
 int main(int argc, char** argv) {
 
     View* view = View::Get(argv[1]);   
-    view->Draw();
+    auto score = view->Draw();
+    std::cout << "Your score is: " << score << std::endl;
     delete view;
     return 0;
 }

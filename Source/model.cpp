@@ -118,8 +118,9 @@ Dir Snake::GetDir() const
 
 Snake::~Snake() {};
 
-Rabbit::Rabbit(const size_t length_x, const size_t length_y)
+Rabbit::Rabbit(const size_t length_x, const size_t length_y, const size_t rabbits_num)
 {
+    rabbits_num_ = rabbits_num;
     for(int i = 0; i < rabbits_num; ++i) 
     {
         std::pair<int, int> tmp = Rabbit::RandCooord(length_x, length_y);
@@ -145,3 +146,15 @@ std::pair<int, int> Rabbit::RandCooord(const size_t length_x, const size_t lengt
     
     return rand_coord;
 }
+
+void Snake::CatchRabbit(std::map<int, int>& rabits, const size_t precision) {
+    if(rabits.count(this->snake_body.at(0).first))
+        if (abs(rabits.at(this->snake_body.at(0).first) - this->snake_body.at(0).second) < precision) 
+        {
+            auto tmp = this->snake_body.at(0).first;
+            this->EatRabbit(std::pair<float, float>(this->snake_body.at(0).first, rabits.at(this->snake_body.at(0).first)));
+            rabits.erase(tmp);
+        }
+}
+
+Rabbit::~Rabbit() {};

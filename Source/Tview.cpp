@@ -9,7 +9,6 @@
 #include <algorithm>
 
 #include "Tview.hpp"
-#include "snake.hpp"
 #include "model.hpp" 
 
 //Foreground Colors
@@ -31,6 +30,8 @@
 #define BACKGROUND_COL_MAGENTA 45
 #define BACKGROUND_COL_CYAN 46
 #define BACKGROUND_COL_WHITE 47
+
+const size_t precision = 1;
 
 struct termios old_term;
 bool final = false;
@@ -85,8 +86,10 @@ size_t Tview::Draw()
     size_t start_x = length_x / 2;
     size_t start_y = length_y / 2;
 
+    size_t rabbits_num = 50;
+
     Snake snake(start_x, start_y, length_x, length_y);
-    Rabbit rabbits(length_x, length_y);
+    Rabbit rabbits(length_x, length_y, rabbits_num);
 
     while(!final) 
     {
@@ -133,17 +136,19 @@ size_t Tview::Draw()
         CleanScreen();
         DrawBoundary(length_x, length_y);
         DrawSnake(snake.snake_body, snake.GetDir());
-        DrawRabbits(rabbits.map);  
+        DrawRabbits(rabbits.map);
+        Move(3, 2);  
+        printf("score: %d", (int)snake.GetScore());
         final = snake.Move();  
-        CatchRabbit(rabbits.map, snake);
+        snake.CatchRabbit(rabbits.map, precision);
         fflush(stdout);
     }
-    std::cout << "GAME IS OVER! YOUR SCORE : " << snake.GetScore() << std::endl;
+    return snake.GetScore();
 }
 
-void Tview::DrawRabbits(const std::map<int, int>& rabits) 
+void Tview::DrawRabbits(const std::map<int, int>& rabbits) 
 {
-    for(const auto& coord: rabits) 
+    for(const auto& coord: rabbits) 
     {
         Move(coord.first, coord.second);
         SetColor(FOREGROUND_COL_WHITE);
@@ -159,7 +164,7 @@ void Tview::DrawSnake(const std::vector<std::pair<int, int>>& snake_body, Dir di
         Move(snake_body.at(i).first, snake_body.at(i).second);
         if(i == 0) 
         {
-            SetColor(FOREGROUND_COL_WHITE);
+            SetColor(FOREGROUND_COL_GREEN);
             switch (dir)
             {
             case Dir::DOWN :
@@ -184,7 +189,7 @@ void Tview::DrawSnake(const std::vector<std::pair<int, int>>& snake_body, Dir di
         } 
         else 
         {
-            SetColor(FOREGROUND_COL_WHITE);
+            SetColor(FOREGROUND_COL_GREEN);
             printf("o");
         }
     }
@@ -192,7 +197,7 @@ void Tview::DrawSnake(const std::vector<std::pair<int, int>>& snake_body, Dir di
 
 void Tview::DrawBoundary(const size_t length_x, const size_t length_y) 
 {
-    SetColor(FOREGROUND_COL_BLUE);
+    SetColor(FOREGROUND_COL_WHITE);
     Move(1, 1);
     for(int i = 1; i < length_x; ++i) 
     {
@@ -214,13 +219,4 @@ void Tview::DrawBoundary(const size_t length_x, const size_t length_y)
     }
 }
 
-void Tview::CatchRabbit(std::map<int, int>& rabits, Snake& snake) 
-{
-    if(rabits.count(snake.snake_body.at(0).first) && rabits.at(snake.snake_body.at(0).first) == snake.snake_body.at(0).second) 
-    {
-        auto tmp = snake.snake_body.at(0).first;
-        snake.EatRabbit(std::pair<int, int>(snake.snake_body.at(0).first, rabits.at(snake.snake_body.at(0).first)));
-        rabits.erase(tmp);
-        printf("\a");
-    }
-}
+

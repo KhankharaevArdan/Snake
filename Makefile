@@ -11,9 +11,9 @@ BUILDDIR = Build
 all : $(PROG)
 
 $(PROG) : $(addprefix $(BUILDDIR)/, $(OBJ))
-	$(CXX) $(CXXFLAGS) $^ -o $@ 
+	$(CXX) $(CXXFLAGS) $^ -o $@ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 $(addprefix $(BUILDDIR)/, $(OBJ)) : $(BUILDDIR)/%.o : $(SRCDIR)/%.cpp $(INCLDIR)/%.hpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@ 
 
 .PHONY: clean
 .PHONY: depend
